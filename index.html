@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Haapii</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Roboto',sans-serif;background:#FAFAFA;min-height:100vh;color:#222}
+#app{max-width:420px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column}
+.header{background:linear-gradient(180deg,#005A63,#1CA674);padding:16px 20px;display:flex;align-items:center;justify-content:center;position:relative}
+.header-title{color:#fff;font-size:18px;font-weight:700}
+.header-back{position:absolute;left:16px;color:#fff;font-size:26px;cursor:pointer;background:none;border:none;line-height:1}
+.home{flex:1;display:flex;flex-direction:column}
+.home-hero{background:linear-gradient(160deg,#005A63,#1CA674);padding:32px 24px 40px;text-align:center}
+.home-logo{font-size:30px;font-weight:700;color:#fff;letter-spacing:-0.5px;margin-bottom:4px}
+.home-logo em{font-style:italic;color:#f8cf6d}
+.home-sub{color:rgba(255,255,255,.85);font-size:14px}
+.bubble{background:#f8cf6d;color:#222;font-size:13px;font-weight:500;padding:8px 14px;border-radius:16px 16px 16px 4px;display:inline-block;margin-top:16px}
+.home-content{flex:1;padding:20px 16px}
+.section-label{font-size:11px;font-weight:700;color:#005A63;letter-spacing:.08em;text-transform:uppercase;margin-bottom:12px}
+.section-label.mt{margin-top:20px}
+.theme-list{display:flex;flex-direction:column;gap:10px}
+.theme-btn{background:linear-gradient(135deg,#005A63,#1CA674);border:none;border-radius:14px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;transition:opacity .15s;width:100%}
+.theme-btn:hover{opacity:.9}
+.theme-btn.disabled{opacity:.4;cursor:default}
+.theme-left{display:flex;align-items:center}
+.theme-name{color:#fff;font-size:15px;font-weight:500;text-align:left}
+.theme-count{color:rgba(255,255,255,.75);font-size:12px;margin-top:2px;text-align:left}
+.theme-arrow{color:rgba(255,255,255,.7);font-size:20px}
+
+/* QUIZ */
+.quiz{flex:1;display:flex;flex-direction:column}
+.progress-bar{height:5px;background:#e0e0e0}
+.progress-fill{height:100%;background:linear-gradient(90deg,#005A63,#1CA674);transition:width .4s ease}
+.quiz-counter{text-align:right;padding:8px 16px 0;font-size:12px;color:#888}
+.image-zone{margin:10px 16px;border-radius:16px;overflow:hidden;background:#fff;border:1px solid #eee;min-height:160px;display:flex;align-items:center;justify-content:center}
+.img-real{width:100%;max-height:180px;object-fit:contain}
+.img-fallback{font-size:72px;padding:16px}
+
+/* BARRE DE PROGRESSION DU MOT */
+.word-progress{margin:6px 16px 10px;display:flex;flex-direction:column;align-items:center;gap:6px}
+.word-level{font-size:11px;color:#005A63;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.word-dots{display:flex;gap:6px}
+.dot{width:28px;height:6px;border-radius:99px;background:#e0e0e0;transition:background .3s}
+.dot.filled{background:linear-gradient(90deg,#005A63,#1CA674)}
+.dot.gold{background:#f8cf6d}
+.level-up{text-align:center;font-size:13px;font-weight:700;color:#1CA674;min-height:20px;margin-bottom:4px}
+
+.question-text{padding:0 16px 10px;font-size:14px;color:#555;text-align:center}
+.choices{padding:0 16px;display:flex;flex-direction:column;gap:10px;flex:1}
+.choice-row{display:flex;align-items:center;gap:8px}
+.choice-btn{flex:1;background:linear-gradient(135deg,#005A63,#1CA674);color:#fff;border:none;border-radius:12px;padding:15px 16px;font-size:15px;font-weight:500;font-family:'Roboto',sans-serif;cursor:pointer;transition:all .15s;text-align:center}
+.choice-btn:disabled{cursor:default}
+.choice-btn.correct{background:linear-gradient(135deg,#1CA674,#0e8a5a);border:2px solid #0e8a5a}
+.choice-btn.wrong{background:linear-gradient(135deg,#c0392b,#e74c3c);border:2px solid #c0392b}
+.choice-indicator{font-size:20px;width:24px;text-align:center;flex-shrink:0}
+.next-area{padding:16px;margin-top:auto}
+.next-btn{width:100%;padding:15px;background:linear-gradient(135deg,#005A63,#1CA674);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:500;font-family:'Roboto',sans-serif;cursor:pointer;display:none}
+.next-area{padding:0 16px 16px}
+
+/* RÉSULTAT */
+.result{flex:1;display:flex;flex-direction:column}
+.result-hero{background:linear-gradient(160deg,#005A63,#1CA674);padding:40px 24px;text-align:center}
+.result-emoji{font-size:60px;margin-bottom:12px}
+.result-score{font-size:48px;font-weight:700;color:#fff}
+.result-msg{color:rgba(255,255,255,.9);font-size:15px;margin-top:8px}
+.result-body{padding:24px 16px;display:flex;flex-direction:column;gap:12px}
+.btn-primary{padding:15px;background:linear-gradient(135deg,#005A63,#1CA674);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;font-family:'Roboto',sans-serif;cursor:pointer;width:100%}
+.btn-secondary{padding:15px;background:#fff;color:#005A63;border:2px solid #005A63;border-radius:12px;font-size:15px;font-weight:500;font-family:'Roboto',sans-serif;cursor:pointer;width:100%}
+
+/* STATS LIBRE */
+.libre-stats{display:flex;justify-content:space-around;padding:10px 16px 0;font-size:12px;color:#555}
+.stat-item{text-align:center}
+.stat-num{font-size:18px;font-weight:700;color:#005A63}
+.stat-label{font-size:11px;color:#888;margin-top:2px}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+const BASE_URL="https://raw.githubusercontent.com/Haappii-tems/reo-maohi-images/main/";
+const STREAK_TO_LEVEL=5;
+// Niveau de session : 1=2choix, 2=3choix, 3=4choix
+// streak_session = bonnes réponses consécutives dans la session
+
+const DATA=[
+  {theme:"FAMILLE",mot:"tamariʻi",fr:"enfants",img:"tamarii.svg"},
+  {theme:"FAMILLE",mot:"tamāroa",fr:"garçon",img:"tamaroa.svg"},
+  {theme:"FAMILLE",mot:"tamāhine",fr:"fille",img:"tamahine.svg"},
+  {theme:"FAMILLE",mot:"pēpe",fr:"bébé",img:"pepe.svg"},
+  {theme:"FAMILLE",mot:"metua vahine",fr:"mère",img:"metua_vahine.svg"},
+  {theme:"FAMILLE",mot:"metua tane",fr:"père",img:"papa.svg"},
+  {theme:"VETEMENTS",mot:"piripou poto",fr:"short",img:"piripou_poto.svg"},
+  {theme:"VETEMENTS",mot:"piriaro",fr:"tee-shirt",img:"piriaro.svg"},
+  {theme:"VETEMENTS",mot:"'ahu",fr:"chemise",img:"ahu.svg"},
+  {theme:"VETEMENTS",mot:"tīa'a",fr:"chaussure",img:"tiaa.svg"},
+  {theme:"VETEMENTS",mot:"piripau 'avae roa",fr:"pantalon",img:"piripou_avae_roa.svg"},
+  {theme:"VETEMENTS",mot:"'ahu vahine",fr:"robe",img:"ahu_vahine.svg"},
+  {theme:"VETEMENTS",mot:"piritoti",fr:"jupe",img:"piritoti.svg"},
+  {theme:"VETEMENTS",mot:"taumata",fr:"casquette",img:"taumata.svg"},
+  {theme:"VETEMENTS",mot:"tōtini",fr:"chaussette",img:"totini.svg"},
+  {theme:"VETEMENTS",mot:"hātua",fr:"ceinture",img:"hatua.svg"},
+  {theme:"VETEMENTS",mot:"fāupo'o",fr:"bonnet / chapeau",img:"faupoo.svg"},
+  {theme:"VETEMENTS",mot:"pāreu",fr:"paréo",img:"pareu.svg"},
+  {theme:"REPAS",mot:"faraoa",fr:"pain",img:"faraoa.svg"},
+  {theme:"REPAS",mot:"huero",fr:"oeuf",img:"huero.svg"},
+  {theme:"REPAS",mot:"pata",fr:"beurre",img:"pata.svg"},
+  {theme:"REPAS",mot:"ū",fr:"lait",img:"u.svg"},
+  {theme:"REPAS",mot:"taofe",fr:"café",img:"taofe.svg"},
+  {theme:"REPAS",mot:"pape",fr:"eau",img:"pape.svg"},
+  {theme:"REPAS",mot:"mōhina",fr:"bouteille",img:"mohina.svg"},
+  {theme:"REPAS",mot:"tipi",fr:"couteau",img:"tipi.svg"},
+  {theme:"REPAS",mot:"tāipu",fr:"cuillère",img:"taipu.svg"},
+  {theme:"REPAS",mot:"pāti'a mā'a",fr:"fourchette",img:"patia_maa.svg"},
+  {theme:"REPAS",mot:"hāpaina",fr:"verre",img:"hapaina.svg"},
+  {theme:"REPAS",mot:"merēti",fr:"assiette",img:"mereti.svg"},
+  {theme:"REPAS",mot:"'āu'a",fr:"bol",img:"aua.svg"},
+  {theme:"REPAS",mot:"mā'a",fr:"nourriture",img:"maa.svg"},
+  {theme:"ECOLE",mot:"'orometua",fr:"maîtresse",img:"orometua.svg"},
+  {theme:"ECOLE",mot:"pīahi",fr:"élève",img:"piahi.svg"},
+  {theme:"ECOLE",mot:"vaira'a pēnitara",fr:"trousse",img:"vairaa_penitara.svg"},
+  {theme:"ECOLE",mot:"vaira'a parau",fr:"cartable",img:"vairaa_parau.svg"},
+  {theme:"ECOLE",mot:"pēnitara",fr:"crayon / stylo",img:"penitara.svg"},
+  {theme:"ECOLE",mot:"puta",fr:"livre",img:"puta.svg"},
+  {theme:"TRANSPORT",mot:"va'a",fr:"pirogue",img:"vaa.svg"},
+  {theme:"TRANSPORT",mot:"poti",fr:"bateau",img:"poti.svg"},
+  {theme:"TRANSPORT",mot:"manureva",fr:"avion",img:"manureva.svg"},
+  {theme:"TRANSPORT",mot:"pere'o'o",fr:"voiture",img:"pereoo.svg"},
+  {theme:"TRANSPORT",mot:"pere'o'o ta'ata'ahi",fr:"vélo",img:"pereoo_taataahi.svg"},
+  {theme:"TRANSPORT",mot:"pere'o'o piti huira",fr:"scooter",img:"pereoo_piti_huira.svg"},
+  {theme:"TRANSPORT",mot:"purūmu",fr:"route",img:"purumu.svg"},
+  {theme:"TRANSPORT",mot:"pere'o'o mataeina'a",fr:"truck / bus",img:"pereoo_mataeinaa.svg"},
+  {theme:"TRANSPORT",mot:"tapeara'a",fr:"arrêt de bus",img:"tapearaa.svg"},
+  {theme:"TRANSPORT",mot:"vaira'a pere'o'o",fr:"parking",img:"vairaa_pereoo.svg"},
+  {theme:"TEMPS",mot:"po'ipo'i",fr:"matin",img:"poipoi.svg"},
+  {theme:"TEMPS",mot:"avatea",fr:"midi",img:"avatea.svg"},
+  {theme:"TEMPS",mot:"ahiahi",fr:"soir",img:"ahiahi.svg"},
+  {theme:"TEMPS",mot:"pō",fr:"nuit",img:"po.svg"},
+  {theme:"TEMPS",mot:"uāti",fr:"heure / montre",img:"uati.svg"},
+  {theme:"TEMPS",mot:"mahana",fr:"journée",img:"mahana.svg"},
+  {theme:"TEMPS",mot:"tāere",fr:"en retard",img:"taere.svg"},
+  {theme:"TEMPS",mot:"'oi'oi",fr:"rapide",img:"oioi.svg"},
+  {theme:"FRUITS",mot:"ha'ari",fr:"coco",img:"haari.svg"},
+  {theme:"FRUITS",mot:"'ānani popa'ā",fr:"pamplemousse",img:"anani_popaa.svg"},
+  {theme:"FRUITS",mot:"'ānani",fr:"orange",img:"anani.svg"},
+  {theme:"FRUITS",mot:"'ī'īta",fr:"papaye",img:"iita.svg"},
+  {theme:"FRUITS",mot:"vī",fr:"mangue",img:"vi.svg"},
+  {theme:"FRUITS",mot:"mei'a",fr:"banane",img:"meia.svg"},
+  {theme:"FRUITS",mot:"'uru",fr:"fruit de l'arbre à pain",img:"uru.svg"},
+  {theme:"FRUITS",mot:"painapo",fr:"ananas",img:"painapo.svg"},
+  {theme:"ANIMAUX",mot:"manu",fr:"oiseau",img:"manu.svg"},
+  {theme:"ANIMAUX",mot:"'iore",fr:"rat",img:"iore.svg"},
+  {theme:"ANIMAUX",mot:"'ūri",fr:"chien",img:"uri.svg"},
+  {theme:"ANIMAUX",mot:"mīmī",fr:"chat",img:"mimi.svg"},
+  {theme:"ANIMAUX",mot:"mo'o",fr:"lézard",img:"moo.svg"},
+  {theme:"ANIMAUX",mot:"tupa",fr:"crabe",img:"tupa.svg"},
+  {theme:"ANIMAUX",mot:"moa",fr:"poule",img:"moa.svg"},
+  {theme:"ANIMAUX",mot:"pua'a",fr:"porc",img:"puaa.svg"},
+  {theme:"ANIMAUX",mot:"i'a",fr:"poisson",img:"ia.svg"},
+  {theme:"ACTIVITE",mot:"hōrue",fr:"surf",img:"horue.svg"},
+  {theme:"ACTIVITE",mot:"haerera'a",fr:"randonnée",img:"haereraa.svg"},
+  {theme:"ACTIVITE",mot:"'aura'a",fr:"nage",img:"auraa.svg"},
+  {theme:"ACTIVITE",mot:"hoera'a va'a",fr:"rame",img:"hoeraa_vaa.svg"},
+  {theme:"ACTIVITE",mot:"tāorara'a pōro",fr:"pétanque",img:"taoraraa_poro.svg"},
+  {theme:"ACTIVITE",mot:"pupuhira'a",fr:"chasse",img:"pupuhiraa.svg"},
+  {theme:"ACTIVITE",mot:"tu'era'a pōpō",fr:"football",img:"tueraa_popo.svg"},
+  {theme:"ACTIVITE",mot:"'iri tāi'e",fr:"voile",img:"iri_taie.svg"},
+  {theme:"ACTIVITE",mot:"hōrue tā pāuma",fr:"kitesurf",img:"horue_ta_pauma.svg"},
+];
+
+const THEMES={
+  FAMILLE:{label:"Famille"},VETEMENTS:{label:"Vêtements"},REPAS:{label:"Repas"},
+  ECOLE:{label:"École"},TRANSPORT:{label:"Transport"},TEMPS:{label:"Temps"},
+  FRUITS:{label:"Fruits"},ANIMAUX:{label:"Animaux"},ACTIVITE:{label:"Activités"}
+};
+
+function shuffle(a){return a.slice().sort(()=>Math.random()-.5)}
+function byTheme(t){return DATA.filter(d=>d.theme===t)}
+function indId(m){return"ind-"+m.replace(/[^a-zA-Z0-9]/g,'_')}
+
+// ---- SYSTÈME DE NIVEAUX PAR MOT ----
+// niveau 1=2choix, 2=3choix, 3=4choix. streak = bonnes réponses consécutives
+const wordState={};
+DATA.forEach(d=>{wordState[d.mot]={level:1,streak:0,mastered:false};});
+
+function choicesCount(){
+  return S.sessionLevel===1?2:S.sessionLevel===2?3:4;
+}
+
+function sessionLevelLabel(){
+  return S.sessionLevel===1?"Niveau 1 — 2 choix":S.sessionLevel===2?"Niveau 2 — 3 choix":"Niveau 3 — 4 choix";
+}
+
+function renderSessionProgress(){
+  const dots=Array.from({length:STREAK_TO_LEVEL},(_,i)=>
+    `<div class="dot${i<S.sessionStreak?' filled':''}"></div>`
+  ).join("");
+  if(S.sessionLevel===3 && S.sessionStreak===0 && !S.levelUpMsg){
+    return `<div class="word-progress">
+      <div class="word-level">${sessionLevelLabel()}</div>
+      <div class="word-dots">${dots}</div>
+      <div class="level-up"></div>
+    </div>`;
+  }
+  return `<div class="word-progress">
+    <div class="word-level">${sessionLevelLabel()}</div>
+    <div class="word-dots">${dots}</div>
+    ${S.levelUpMsg?`<div class="level-up">${S.levelUpMsg}</div>`:`<div class="level-up"></div>`}
+  </div>`;
+}
+
+function buildLibreQ(){
+  // Les mots maîtrisés ont moins de poids
+  const weighted=DATA.map(d=>({d,w:wordState[d.mot].mastered?0.2:1}));
+  const total=weighted.reduce((s,x)=>s+x.w,0);
+  let r=Math.random()*total;
+  let chosen=DATA[0];
+  for(const x of weighted){r-=x.w;if(r<=0){chosen=x.d;break;}}
+  return makeQ(chosen);
+}
+
+function makeQ(q){
+  const n=choicesCount(q.mot);
+  const wrong=shuffle(DATA.filter(d=>d.mot!==q.mot)).slice(0,n-1).map(d=>d.mot);
+  return {...q,choices:shuffle([q.mot,...wrong])};
+}
+
+function buildThemeQuestions(theme){
+  return shuffle(byTheme(theme));
+}
+
+// ---- STATE ----
+const S={
+  screen:"menu",
+  theme:null,questions:[],current:0,score:0,
+  answered:false,levelUpMsg:"",
+  sessionLevel:1, sessionStreak:0,
+  libreQ:null,libreScore:0,libreTotal:0
+};
+
+// ---- RENDERERS ----
+function renderMenu(){
+  return `<div class="home">
+    <div class="home-hero">
+      <div class="home-logo">Ha<em>ap</em>ii</div>
+      <div class="home-sub">Apprendre la langue polynésienne</div>
+      <div class="bubble">Ia ora na ! Maeva !</div>
+    </div>
+    <div class="home-content">
+      <div class="section-label">Vocabulaire</div>
+      <div class="theme-list">
+        <button class="theme-btn" id="btnLibre">
+          <div class="theme-left"><div>
+            <div class="theme-name">Mode libre</div>
+            <div class="theme-count">Tous les thèmes · infini · progression adaptée</div>
+          </div></div>
+          <span class="theme-arrow">›</span>
+        </button>
+        <button class="theme-btn" id="btnTheme">
+          <div class="theme-left"><div>
+            <div class="theme-name">Par thème</div>
+            <div class="theme-count">Choisis un thème spécifique</div>
+          </div></div>
+          <span class="theme-arrow">›</span>
+        </button>
+      </div>
+      <div class="section-label mt">Bientôt disponible</div>
+      <div class="theme-list">
+        <button class="theme-btn disabled" disabled>
+          <div class="theme-left"><div><div class="theme-name">Verbes</div></div></div>
+          <span class="theme-arrow">›</span>
+        </button>
+        <button class="theme-btn disabled" disabled>
+          <div class="theme-left"><div><div class="theme-name">Phrases</div></div></div>
+          <span class="theme-arrow">›</span>
+        </button>
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderHome(){
+  const keys=[...new Set(DATA.map(d=>d.theme))];
+  return `<div class="home">
+    <div class="header">
+      <button class="header-back" id="backBtn">‹</button>
+      <span class="header-title">Choisir un thème</span>
+    </div>
+    <div class="home-content" style="margin-top:16px">
+      <div class="theme-list">
+        ${keys.map(t=>{
+          const th=THEMES[t]||{label:t};
+          const n=byTheme(t).length;
+          const mastered=byTheme(t).filter(d=>wordState[d.mot].mastered).length;
+          return `<button class="theme-btn" data-theme="${t}">
+            <div class="theme-left"><div>
+              <div class="theme-name">${th.label}</div>
+              <div class="theme-count">${mastered}/${n} mots maîtrisés</div>
+            </div></div>
+            <span class="theme-arrow">›</span>
+          </button>`;
+        }).join("")}
+      </div>
+    </div>
+  </div>`;
+}
+
+function renderWordProgress(mot){
+  const ws=wordState[mot];
+  if(ws.mastered) return `<div class="word-progress"><div class="word-level">⭐ Maîtrisé !</div></div>`;
+  const lvlLabel=ws.level===1?"Niveau 1 — 2 choix":ws.level===2?"Niveau 2 — 3 choix":"Niveau 3 — 4 choix";
+  const dots=Array.from({length:STREAK_TO_LEVEL},(_,i)=>
+    `<div class="dot${i<ws.streak?' filled':''}"></div>`
+  ).join("");
+  return `<div class="word-progress">
+    <div class="word-level">${lvlLabel}</div>
+    <div class="word-dots">${dots}</div>
+    ${S.levelUpMsg?`<div class="level-up">${S.levelUpMsg}</div>`:`<div class="level-up"></div>`}
+  </div>`;
+}
+
+function renderQuizScreen(q,pct,counter,titre,isLibre){
+  const imgUrl=BASE_URL+q.img;
+  const mastered=DATA.filter(d=>wordState[d.mot].mastered).length;
+  return `<div class="quiz">
+    <div class="header">
+      <button class="header-back" id="backBtn">‹</button>
+      <span class="header-title">${titre}</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    <div class="quiz-counter">${counter}</div>
+    ${isLibre?`<div class="libre-stats">
+      <div class="stat-item"><div class="stat-num">${S.libreScore}</div><div class="stat-label">bonnes réponses</div></div>
+      <div class="stat-item"><div class="stat-num">${mastered}</div><div class="stat-label">mots maîtrisés</div></div>
+      <div class="stat-item"><div class="stat-num">${S.libreTotal}</div><div class="stat-label">questions</div></div>
+    </div>`:""}
+    <div class="image-zone">
+      <img class="img-real" src="${imgUrl}" alt="${q.fr}"
+        onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+      <div class="img-fallback" style="display:none">🌺</div>
+    </div>
+    ${renderSessionProgress()}
+    <div class="question-text">Quel est le mot qui correspond à l'image ?</div>
+    <div class="choices" id="choices">
+      ${q.choices.map(c=>`
+        <div class="choice-row">
+          <button class="choice-btn" data-choice="${c}">${c}</button>
+          <span class="choice-indicator" id="${indId(c)}"></span>
+        </div>`).join("")}
+      <button class="next-btn" id="nextBtn">Question suivante</button>
+    </div>
+  </div>`;
+}
+
+function renderResult(){
+  const total=S.questions.length;
+  const pct=Math.round((S.score/total)*100);
+  const emoji=pct>=80?"🌟":pct>=50?"🌺":"💪";
+  const msg=pct>=80?"Māuruuru roa ! Excellent !":pct>=50?"Māita'i ! Bien joué !":"Continue, tu progresses !";
+  return `<div class="result">
+    <div class="result-hero">
+      <div class="result-emoji">${emoji}</div>
+      <div class="result-score">${S.score} / ${total}</div>
+      <div class="result-msg">${msg}</div>
+    </div>
+    <div class="result-body">
+      <button class="btn-primary" id="restartBtn">Rejouer ce thème</button>
+      <button class="btn-secondary" id="homeBtn">Changer de thème</button>
+    </div>
+  </div>`;
+}
+
+// ---- LOGIQUE RÉPONSE ----
+function handleAnswer(choice,correct,isLibre){
+  if(S.answered) return;
+  S.answered=true;
+  if(isLibre) S.libreTotal++;
+  document.querySelectorAll(".choice-btn").forEach(b=>b.disabled=true);
+  const ws=wordState[correct];
+  S.levelUpMsg="";
+
+  if(choice===correct){
+    if(isLibre) S.libreScore++;
+    else S.score++;
+    document.querySelector(`.choice-btn[data-choice="${correct}"]`).classList.add("correct");
+    const ind=document.getElementById(indId(correct));
+    if(ind) ind.textContent="✓";
+
+    // Maîtrise du mot (arrière-plan)
+    const ws=wordState[correct];
+    if(!ws.mastered){ws.streak++;if(ws.streak>=3){ws.mastered=true;}}
+
+    // Niveau de session
+    S.levelUpMsg="";
+    S.sessionStreak++;
+    if(S.sessionStreak>=STREAK_TO_LEVEL && S.sessionLevel<3){
+      S.sessionLevel++;
+      S.sessionStreak=0;
+      S.levelUpMsg=S.sessionLevel===2?"🎉 Niveau 2 — 3 choix !":"🎉 Niveau 3 — 4 choix !";
+    }
+
+    setTimeout(()=>{
+      S.answered=false;S.levelUpMsg="";
+      if(isLibre){S.libreQ=buildLibreQ();}
+      else{S.current++;if(S.current>=S.questions.length){S.screen="result";}}
+      render();
+    },S.levelUpMsg?1200:700);
+  } else {
+    S.sessionStreak=0; // reset streak sur erreur
+    const ws=wordState[correct];
+    ws.streak=0;
+    document.querySelector(`.choice-btn[data-choice="${choice}"]`).classList.add("wrong");
+    const wi=document.getElementById(indId(choice));
+    if(wi) wi.textContent="✗";
+    document.querySelectorAll(".choice-btn").forEach(b=>{
+      if(b.dataset.choice===correct){
+        b.classList.add("correct");
+        const ci=document.getElementById(indId(correct));
+        if(ci) ci.textContent="✓";
+      }
+    });
+    document.getElementById("nextBtn").style.display="block";
+  }
+}
+
+// ---- RENDER + BIND ----
+function render(){
+  const app=document.getElementById("app");
+  const q=S.screen==="libre"?S.libreQ:S.screen==="quiz"?S.questions[S.current]:null;
+  if(S.screen==="menu") app.innerHTML=renderMenu();
+  else if(S.screen==="home") app.innerHTML=renderHome();
+  else if(S.screen==="libre") app.innerHTML=renderQuizScreen(q,100,`∞`,"Mode libre",true);
+  else if(S.screen==="quiz") app.innerHTML=renderQuizScreen(makeQ(S.questions[S.current]),Math.round((S.current/S.questions.length)*100),`${S.current+1} / ${S.questions.length}`,THEMES[S.theme]?.label||S.theme,false);
+  else app.innerHTML=renderResult();
+  bind();
+}
+
+function bind(){
+  const back=document.getElementById("backBtn");
+  if(back) back.addEventListener("click",()=>{
+    if(S.screen==="home"||S.screen==="libre") S.screen="menu";
+    else if(S.screen==="quiz") S.screen="home";
+    render();
+  });
+
+  const bl=document.getElementById("btnLibre");
+  if(bl) bl.addEventListener("click",()=>{
+    S.screen="libre";S.libreScore=0;S.libreTotal=0;
+    S.sessionLevel=1;S.sessionStreak=0;S.levelUpMsg="";
+    S.answered=false;S.libreQ=buildLibreQ();render();
+  });
+
+  const bt=document.getElementById("btnTheme");
+  if(bt) bt.addEventListener("click",()=>{S.screen="home";render();});
+
+  document.querySelectorAll(".theme-btn[data-theme]").forEach(el=>{
+    el.addEventListener("click",()=>{
+      S.theme=el.dataset.theme;
+      S.sessionLevel=1;S.sessionStreak=0;S.levelUpMsg="";
+      S.questions=buildThemeQuestions(S.theme);
+      S.current=0;S.score=0;S.answered=false;S.screen="quiz";render();
+    });
+  });
+
+  const isLibre=S.screen==="libre";
+  document.querySelectorAll(".choice-btn").forEach(btn=>{
+    btn.addEventListener("click",()=>{
+      const correct=isLibre?S.libreQ.mot:S.questions[S.current].mot;
+      handleAnswer(btn.dataset.choice,correct,isLibre);
+    });
+  });
+
+  const nb=document.getElementById("nextBtn");
+  if(nb) nb.addEventListener("click",()=>{
+    S.answered=false;S.levelUpMsg="";
+    if(isLibre){S.libreQ=buildLibreQ();render();}
+    else{S.current++;if(S.current>=S.questions.length)S.screen="result";render();}
+  });
+
+  const rb=document.getElementById("restartBtn");
+  if(rb) rb.addEventListener("click",()=>{
+    S.questions=buildThemeQuestions(S.theme);S.current=0;S.score=0;S.answered=false;S.screen="quiz";render();
+  });
+
+  const hb=document.getElementById("homeBtn");
+  if(hb) hb.addEventListener("click",()=>{S.screen="menu";render();});
+}
+
+render();
+</script>
+</body>
+</html>
